@@ -16,7 +16,14 @@ var connection = mysql.createConnection({
   database:'pl_test_schemas',
 })
 
+//source for routes
+var userRoutes = require('./apiRoutes/user');
+
+//calling the app routes to be used
+app.use(userRoutes);
+
 const PORT = process.env.PORT || 49146;
+
 app.listen(PORT, () => {
   console.log(`Node server listening on ${PORT}!`);
   
