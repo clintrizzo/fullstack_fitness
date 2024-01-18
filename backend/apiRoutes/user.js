@@ -85,6 +85,42 @@ router.post('/api/users', (req, res) => {
   });
 });
 
+// New route for user login
+router.post('/api/users/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const query = `
+    SELECT * FROM pl_test_schemas.Users
+    WHERE email = ? AND password = ?`;
+
+  connection.query(query, [email, password], function (err, rows, fields) {
+    if (err) {
+      console.error(err);
+      res.status(500).json('Failed');
+      return;
+    }
+
+    if (rows && rows.length > 0) {
+      const user = {
+        userId: rows[0].userid,
+        username: rows[0].username,
+        firstname: rows[0].firstname,
+        lastname: rows[0].lastname,
+        // Include other fields you need
+      };
+
+      res.json({
+        status: 'Login Successful',
+        user: user,
+      });
+    } else {
+      res.status(401).json('Login Failed');
+    }
+  });
+});
+
+
 
 router.delete('/api/users/:id',(req,res)=>{
 
