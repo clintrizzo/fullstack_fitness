@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { createConnection } = require('../dbpath/db');
+const crypto = require('crypto');
+const secretKey = crypto.randomBytes(32).toString('hex');
+console.log('Generated Secret Key:', secretKey);
 
 let connection;
 
@@ -14,6 +17,8 @@ let connection;
 })();
 
 // New route for user login
+const jwt = require('jsonwebtoken');
+
 router.post('/api/users/login', async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -34,9 +39,12 @@ router.post('/api/users/login', async (req, res) => {
         // Include other fields you need
       };
 
+      const token = jwt.sign({ userId: user.userId }, secretKey, { expiresIn: '1h' });
+
       res.json({
         status: 'Login Successful',
         user: user,
+        token: token,
       });
     } else {
       res.status(401).json('Login Failed');
@@ -46,6 +54,7 @@ router.post('/api/users/login', async (req, res) => {
     res.status(500).json('Failed');
   }
 });
+
 
 router.post('/api/users/logout', (req, res) => {
   if (req.session) {

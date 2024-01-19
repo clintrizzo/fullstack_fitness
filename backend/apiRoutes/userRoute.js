@@ -54,24 +54,24 @@ let connection;
 
     router.get('/api/users/:id', (req, res) => {
       const userId = req.params.id;
-      const query = `SELECT * FROM pl_test_schemas.Users WHERE userid = ?`;
-
+      const query = 'SELECT * FROM pl_test_schemas.Users WHERE userid = ?';
+    
       connection.query(query, [userId], function (err, rows, fields) {
         if (err) {
-          console.error(err); // Log the error for debugging
-          res.send('Failed');
-          return; // Ensure to exit the function on error
+          console.error('Error fetching user data:', err);
+          res.status(500).json({ error: 'Failed to fetch user data' });
+          return;
         }
-
-        console.log('Rows:', rows); // Log rows to check its value
-
+    
+        console.log('Rows:', rows);
+    
         if (rows && rows.length > 0) {
-          res.json(rows[0]); // Assuming you want to send the first matching user
+          res.json(rows[0]);
         } else {
-          res.send('User not found');
+          res.status(404).json({ error: 'User not found' });
         }
       });
-    });
+    });    
 
     router.delete('/api/users/:id', (req, res) => {
       var query = `DELETE from pl_test_schemas.Users
