@@ -1,38 +1,46 @@
-var Express = require('express')
-var bodyParser = require('body-parser')
+const Express = require('express');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const { createConnection } = require('./dbpath/db');
 
-var app = Express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
+const app = Express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-var cors = require('cors')
-app.use(cors())
+const cors = require('cors');
+app.use(cors());
 
-var mysql = require('mysql')
-var connection = mysql.createConnection({
-  host:'0.0.0.0',
-  user:'root',
-  password:'root',
-  database:'pl_test_schemas',
-})
+app.use(session({
+  secret: 'dsdsffdcdahjhjdshxjbbjkhhhjddgxgu',
+  resave: false,
+  saveUninitialized: true,
+}));
 
-//source for routes
-var userRoutes = require('./apiRoutes/user');
+// Import routes
+const userRoutes = require('./apiRoutes/userRoute');
+const loginRoutes = require('./apiRoutes/loginRoute');
 
-//calling the app routes to be used
+// Use routes
 app.use(userRoutes);
+app.use(loginRoutes);
 
-const PORT = process.env.PORT || 49146;
+const PORT = process.env.PORT || 5001; // Change the port number if needed
 
-app.listen(PORT, () => {
-  console.log(`Node server listening on ${PORT}!`);
-  
-  connection.connect(function(err) {
-    if (err) throw err;
-    console.log(`Connected To ${connection.config.database}`);
-  });
-});
+// Wrap your code in an immediately invoked async function
+(async () => {
+  try {
+    // Initialize the connection
+    const connection = await createConnection();
 
-app.get('/', (req, res) => {
-  res.send('Hello World this is a second test')
-})
+    app.listen(PORT, () => {
+      console.log(`Node server listening on ${PORT}!`);
+
+      connection.connect((err) => {
+        if (err) throw err;
+        console.log(`Connected To ${connection.config.database}`);
+      });
+    });
+  } catch (error) {
+    console.error('Error in setup:', error);
+  }
+})();

@@ -4,34 +4,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../../components/Loader/Loader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDumbbell } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
-
-  const redirectUser = () => {
-    navigate('/home');
-  };
+  const navigate = useNavigate()
 
   const handleLogin = async (e) => {
-    e.preventDefault();
     setIsLoading(true);
-  
+    e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:49146/api/users/login', {
+      const response = await axios.post('http://localhost:5001/api/users/login', {
         email: email,
         password: password,
       });
-  
+
       const user = response.data.user;
       const username = user.firstname + ' ' + user.lastname;
-  
-      // Redirect after a brief delay
+
+      // Use navigate from react-router-dom to redirect
       setTimeout(() => {
-        redirectUser();
+        navigate('/home', { state: { user } });
       }, 2000);
       toast.success(`Welcome ${username}!`);
     } catch (error) {
@@ -43,7 +41,7 @@ const Login = () => {
   
   return (
     <>
-    <section className="vh-100" style={{ backgroundColor: "#a9a9a9" }}>
+    <section className="vh-100" style={{ backgroundColor: "#a9a9a9", marginTop:'-70px' }}>
       <div className="container py-6 h-100">
         <div className="row d-flex justify-content-center align-items-center h-100">
           <div className="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -77,7 +75,7 @@ const Login = () => {
                       />
                     </div>
 
-                    <button className="btn btn-primary btn-md btn-block" type="submit" style={{marginright:'25px'}}>Login</button>
+                    <button className="btn btn-primary btn-md btn-block" type="submit" style={{marginright:'25px'}}><FontAwesomeIcon icon={faDumbbell}/> Login</button>
                     <button className="btn btn-primary btn-md btn-block" style={{marginLeft:'25px'}}><Link to="/register" style={{marginLeft:'5px', color:'white', textDecoration:'none'}}> Register</Link></button>
                   </form>
                   <hr className="my-4" />
